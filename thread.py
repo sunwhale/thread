@@ -32,7 +32,7 @@ print theta2
 
 r_out_list = []
 theta_list = []
-z_list = [i*P/n for i in range(n+1)]
+z_list = [i*P/n for i in range(1*n+1)]
 for theta in np.arange(0,np.pi,np.pi/m/2):
     if theta <= theta1:
         theta_list.append(theta)
@@ -69,7 +69,6 @@ for theta in theta_list:
 
 segment = 2
 r_interpolated_list = [ [] for seg in range(segment+1)]
-print r_interpolated_list
 
 for seg in range(segment+1):
     for i,theta in enumerate(theta_list):
@@ -86,19 +85,19 @@ for k,z in enumerate(z_list):
             node_list.append({})
             node_list[count]['node_layer'] = k
             node_list[count]['node_row'] = seg
-            node_list[count]['node_column'] = i
             node_list[count]['r'] = r
             theta = theta_list[i] + 2*np.pi/n*k
             if theta >= 2*np.pi:
                 theta -= 2*np.pi
             node_list[count]['theta'] = theta
-            node_list[count]['x'] = r*np.cos(theta + 2*np.pi/n*k)
-            node_list[count]['y'] = r*np.sin(theta + 2*np.pi/n*k)
+            node_list[count]['x'] = r*np.cos(theta)
+            node_list[count]['y'] = r*np.sin(theta)
             node_list[count]['z'] = z
             number_in_layer = int(seg*m*4 + round(theta/(np.pi/m/2)) + 1)
             if number_in_layer > (segment+1)*m*4:
                 number_in_layer -= (segment+1)*m*4
             node_list[count]['node_number_in_layer'] = number_in_layer
+            node_list[count]['node_column'] = (number_in_layer-1) % (m*4)
             node_list[count]['node_number'] = k*(segment+1)*m*4 + number_in_layer
             count += 1
 
@@ -120,17 +119,17 @@ for k,z in enumerate(z_list[:-1]):
                         element_node_order[0] = node['node_number']
                     if node['node_layer'] == k and node['node_row'] == seg and node['node_column'] == i+1:
                         element_node_order[1] = node['node_number']
-                    if node['node_layer'] == k and node['node_row'] == seg+1 and node['node_column'] == i:
-                        element_node_order[2] = node['node_number']
                     if node['node_layer'] == k and node['node_row'] == seg+1 and node['node_column'] == i+1:
+                        element_node_order[2] = node['node_number']
+                    if node['node_layer'] == k and node['node_row'] == seg+1 and node['node_column'] == i:
                         element_node_order[3] = node['node_number']
                     if node['node_layer'] == k+1 and node['node_row'] == seg and node['node_column'] == i:
                         element_node_order[4] = node['node_number']
                     if node['node_layer'] == k+1 and node['node_row'] == seg and node['node_column'] == i+1:
                         element_node_order[5] = node['node_number']
-                    if node['node_layer'] == k+1 and node['node_row'] == seg+1 and node['node_column'] == i:
-                        element_node_order[6] = node['node_number']
                     if node['node_layer'] == k+1 and node['node_row'] == seg+1 and node['node_column'] == i+1:
+                        element_node_order[6] = node['node_number']
+                    if node['node_layer'] == k+1 and node['node_row'] == seg+1 and node['node_column'] == i:
                         element_node_order[7] = node['node_number']
 
             if i+1 >= len(theta_list):
@@ -139,28 +138,65 @@ for k,z in enumerate(z_list[:-1]):
                         element_node_order[0] = node['node_number']
                     if node['node_layer'] == k and node['node_row'] == seg and node['node_column'] == 0:
                         element_node_order[1] = node['node_number']
-                    if node['node_layer'] == k and node['node_row'] == seg+1 and node['node_column'] == i:
-                        element_node_order[2] = node['node_number']
                     if node['node_layer'] == k and node['node_row'] == seg+1 and node['node_column'] == 0:
+                        element_node_order[2] = node['node_number']
+                    if node['node_layer'] == k and node['node_row'] == seg+1 and node['node_column'] == i:
                         element_node_order[3] = node['node_number']
                     if node['node_layer'] == k+1 and node['node_row'] == seg and node['node_column'] == i:
                         element_node_order[4] = node['node_number']
                     if node['node_layer'] == k+1 and node['node_row'] == seg and node['node_column'] == 0:
                         element_node_order[5] = node['node_number']
-                    if node['node_layer'] == k+1 and node['node_row'] == seg+1 and node['node_column'] == i:
-                        element_node_order[6] = node['node_number']
                     if node['node_layer'] == k+1 and node['node_row'] == seg+1 and node['node_column'] == 0:
+                        element_node_order[6] = node['node_number']
+                    if node['node_layer'] == k+1 and node['node_row'] == seg+1 and node['node_column'] == i:
                         element_node_order[7] = node['node_number']
 
             element_list[count]['element_node_order'] = element_node_order
-            element_list[count]['element_number'] = count
+            element_list[count]['element_number'] = count+1
             print count
             count += 1
             
-            
-for node in node_list:
-    print node
+#for node in node_list:
+#    print node
 
+node_list_sort = sorted(node_list, key=lambda e: e.__getitem__('node_number'))
+
+#for node in node_list_sort:
+#    print node
+
+filename = 'nodes.cmf'
+outfile = open(filename, 'w')
+outfile.writelines('*collectorcreateonly(components,"solid","",4)' + '\n')
+for node in node_list_sort:
+    outfile.writelines('*createnode(' + str(node['x'])  +',' + str(node['y']) + ',' + str(node['z']) + ',0,0,0)' + '\n')
+for element in element_list:
+    node_order = ''
+    for n in element['element_node_order']:
+        node_order +=  str(n) + ' '
+    outfile.writelines('*createlist(node,1)' + node_order + '\n')            
+    outfile.writelines('*createelement(208,1,1,0)' + '\n')
+outfile.writelines('*writefile("output.hm",1)' + '\n')
+outfile.close()
+
+#bat_outfile = open('CREAT_HM.bat', 'w')
+#bat_outfile.writelines('call "C:\\Program Files\\Altair\\12.0\\hm\\bin\\win64\\hmbatch.exe" -cnodes.cmf \n')
+#bat_outfile.close()
+
+filename = 'OnePlaneTrn.inp'
+outfile = open(filename, 'w')
+outfile.writelines('*Node' + '\n')
+
+for node in node_list_sort:
+    outfile.writelines('      ' + str(node['node_number']) + ',' + str(node['x']) + ',' + str(node['y']) + ',' + str(node['z']) + '\n')
+
+outfile.writelines('*Element, type=C3D8' + '\n')
+for element in element_list:
+    node_order = ''
+    for n in element['element_node_order']:
+        node_order +=  str(n) + ','
+    outfile.writelines('      '+ str(element['element_number']) + ',' + node_order[:-1] + '\n')
+outfile.close()
+                
 x = []
 y = []
 z = []
