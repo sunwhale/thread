@@ -17,6 +17,7 @@ d = 12.01
 P = 1.5
 H = np.sqrt(3.0)/2.0*P
 rho = np.sqrt(3.0)/24.0*P
+rho = 0.125*P
 #rho = 0.0
 d_1 = d - 5.0/4.0*H
 n = 16
@@ -35,7 +36,7 @@ print theta2
 
 r_out_list = []
 theta_list = []
-z_list = [i*P/n for i in range(5*n+1)]
+z_list = [i*P/n for i in range(1*n+1)]
 for theta in np.arange(0,np.pi,np.pi/m/2):
     if theta <= theta1:
         theta_list.append(theta)
@@ -186,6 +187,8 @@ outfile.close()
 
 filename = 'thread_internal.inp'
 outfile = open(filename, 'w')
+
+outfile.writelines('*Part, name=internal' + '\n')
 outfile.writelines('*Node' + '\n')
 
 for node in node_list_sort:
@@ -197,36 +200,37 @@ for element in element_list:
     for n in element['element_node_order']:
         node_order +=  str(n) + ','
     outfile.writelines('      '+ str(element['element_number']) + ',' + node_order[:-1] + '\n')
+outfile.writelines('*End Part')
 outfile.close()
                 
-x = []
-y = []
-z = []
-for node in node_list:
-    x.append(node['x'])
-    y.append(node['y'])
-    z.append(node['z'])
-
-ax = plt.subplot(111,projection='polar')
-#projection = 'polar' 指定为极坐标
-ax.set_theta_zero_location('E')
-ax.set_theta_direction(1)
-
-#ax.plot(theta_list, r_out_list, linewidth=3,color='red')
-#ax.plot(theta_list, r_in_list, linewidth=3,color='blue')
-
-for seg in range(segment+1):
-    ax.plot(theta_list, r_interpolated_list[seg], ls='', marker='o', color='black')
-    
-#第一个参数为角度，第二个参数为极径
-
-ax.grid(True) #是否有网格
-
-plt.show()
-
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-
-ax.scatter(x,y,z)
-plt.show()
+#x = []
+#y = []
+#z = []
+#for node in node_list:
+#    x.append(node['x'])
+#    y.append(node['y'])
+#    z.append(node['z'])
+#
+#ax = plt.subplot(111,projection='polar')
+##projection = 'polar' 指定为极坐标
+#ax.set_theta_zero_location('E')
+#ax.set_theta_direction(1)
+#
+##ax.plot(theta_list, r_out_list, linewidth=3,color='red')
+##ax.plot(theta_list, r_in_list, linewidth=3,color='blue')
+#
+#for seg in range(segment+1):
+#    ax.plot(theta_list, r_interpolated_list[seg], ls='', marker='o', color='black')
+#    
+##第一个参数为角度，第二个参数为极径
+#
+#ax.grid(True) #是否有网格
+#
+#plt.show()
+#
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
+#
+#
+#ax.scatter(x,y,z)
+#plt.show()
