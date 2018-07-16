@@ -13,15 +13,16 @@ import numpy as np
 def rotation(theta, phi):
     return theta + phi
 
-d = 9.972
-P = 1.25
+d = 43.0
+P = 1.5
 H = np.sqrt(3.0)/2.0*P
 rho = np.sqrt(3.0)/12.0*P
-#rho = 0.0
+cycle = 1.5/P
+
 n = 32
 m = 16
-segment = 7
-boundary_layer = 3
+segment = 5
+boundary_layer = 2
 
 H1P = 0.125
 theta1 = np.sqrt(3.0)*np.pi*rho/P
@@ -36,7 +37,7 @@ print theta2
 
 r_out_list = []
 theta_list = []
-z_list = [i*P/n for i in range(5*n+1)]
+z_list = [i*P/n for i in range(int(round(cycle*n))+1)]
 for theta in np.arange(0,np.pi,np.pi/m/2):
     if theta <= theta1:
         theta_list.append(theta)
@@ -64,7 +65,7 @@ for theta in np.arange(np.pi,2*np.pi,np.pi/m/2):
 #print r_out_list
 
 r_in_list = []
-inner_cycle_diameter = d + 1.5*P
+inner_cycle_diameter = d - 1.5*P
 for theta in theta_list:
     r_in_list.append(inner_cycle_diameter/2)
 

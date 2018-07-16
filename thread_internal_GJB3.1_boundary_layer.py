@@ -13,16 +13,16 @@ import numpy as np
 def rotation(theta, phi):
     return theta + phi
 
-d = 10.0
-P = 1.25
+d = 43.01
+P = 1.5
 H = np.sqrt(3.0)/2.0*P
 rho = np.sqrt(3.0)/24.0*P
-#rho = 0.0
+cycle = 1.5/P
 
 n = 32
 m = 16
-segment = 7
-boundary_layer = 3
+segment = 5
+boundary_layer = 2
 
 H1P = 0.125
 H2P = 5.0/16.0
@@ -39,7 +39,7 @@ print theta2
 
 r_out_list = []
 theta_list = []
-z_list = [i*P/n for i in range(5*n+1)]
+z_list = [i*P/n for i in range(int(round(cycle*n))+1)]
 for theta in np.arange(0,np.pi,np.pi/m/2):
     if theta <= theta1:
         theta_list.append(theta)
@@ -207,7 +207,7 @@ outfile.close()
 filename = 'thread_internal.inp'
 outfile = open(filename, 'w')
 
-outfile.writelines('*Part, name=inxternal' + '\n')
+outfile.writelines('*Part, name=internal' + '\n')
 outfile.writelines('*Node' + '\n')
 
 for node in node_list_sort:
