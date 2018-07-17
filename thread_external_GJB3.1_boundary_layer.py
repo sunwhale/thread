@@ -19,10 +19,10 @@ H = np.sqrt(3.0)/2.0*P
 rho = np.sqrt(3.0)/12.0*P
 cycle = 1.5/P
 
-n = 32
+n = 16
 m = 16
 segment = 5
-boundary_layer = 2
+boundary_layer = 1
 
 H1P = 0.125
 theta1 = np.sqrt(3.0)*np.pi*rho/P
@@ -65,7 +65,7 @@ for theta in np.arange(np.pi,2*np.pi,np.pi/m/2):
 #print r_out_list
 
 r_in_list = []
-inner_cycle_diameter = d - 1.5*P
+inner_cycle_diameter = d - 2.0*P
 for theta in theta_list:
     r_in_list.append(inner_cycle_diameter/2)
 
@@ -212,7 +212,7 @@ outfile.writelines('*Node' + '\n')
 for node in node_list_sort:
     outfile.writelines('      ' + str(node['node_number']) + ',' + str(node['x']) + ',' + str(node['y']) + ',' + str(node['z']) + '\n')
 
-outfile.writelines('*Element, type=C3D8' + '\n')
+outfile.writelines('*Element, type=C3D8I' + '\n')
 for element in element_list:
     node_order = ''
     for n in element['element_node_order']:
